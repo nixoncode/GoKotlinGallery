@@ -59,19 +59,20 @@ func (q *Queries) GetImage(ctx context.Context, filename string) (Image, error) 
 }
 
 const getImageDetails = `-- name: GetImageDetails :one
-SELECT filename, metadata
+SELECT filename, metadata, description
 FROM images
 WHERE filename = $1
 `
 
 type GetImageDetailsRow struct {
-	Filename string                `json:"filename"`
-	Metadata pqtype.NullRawMessage `json:"metadata"`
+	Filename    string                `json:"filename"`
+	Metadata    pqtype.NullRawMessage `json:"metadata"`
+	Description sql.NullString        `json:"description"`
 }
 
 func (q *Queries) GetImageDetails(ctx context.Context, filename string) (GetImageDetailsRow, error) {
 	row := q.db.QueryRowContext(ctx, getImageDetails, filename)
 	var i GetImageDetailsRow
-	err := row.Scan(&i.Filename, &i.Metadata)
+	err := row.Scan(&i.Filename, &i.Metadata, &i.Description)
 	return i, err
 }

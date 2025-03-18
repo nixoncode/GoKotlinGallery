@@ -11,6 +11,6 @@ FROM images
 WHERE filename = $1;
 
 -- name: GetImageDetails :one
-SELECT filename, metadata
+SELECT filename, metadata, description
 FROM images
 WHERE filename = $1;
