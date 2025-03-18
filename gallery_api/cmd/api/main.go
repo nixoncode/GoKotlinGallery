@@ -8,6 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/nixoncode/gallery_api/internal/database"
 	"github.com/nixoncode/gallery_api/internal/handlers"
 	"github.com/nixoncode/gallery_api/internal/storage"
@@ -22,8 +23,8 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	//e.Use(middleware.Logger())
-	//e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	// Error Handler
 	e.HTTPErrorHandler = customHTTPErrorHandler
