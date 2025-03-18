@@ -48,7 +48,7 @@ func (s *Storage) SaveImage(filename string, description string, metadata map[st
 	_, err = s.queries.CreateImage(context.Background(), sqlc.CreateImageParams{
 		Filename:    filename,
 		Description: sql.NullString{String: description, Valid: description != ""},
-		Metadata:    pqtype.NullRawMessage{RawMessage: json.RawMessage(metadataJSON), Valid: true},
+		Metadata:    pqtype.NullRawMessage{RawMessage: metadataJSON, Valid: true},
 	})
 
 	return err
@@ -60,25 +60,28 @@ func (s *Storage) GetImage(filename string) (io.ReadCloser, error) {
 	return file, err
 }
 
-func (s *Storage) GetImageDetails(filename string) (*models.Image, error) {
-	image, err := s.queries.GetImageDetails(context.Background(), filename)
+func (s *Storage) GetImageDetails() ([]models.Image, error) {
+	images, err := s.queries.ListAllImageDetails(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	var metadata map[string]interface{}
-	if image.Metadata.Valid {
-		err := json.Unmarshal(image.Metadata.RawMessage, &metadata)
-		if err != nil {
-			return nil, err
+	imageModels := make([]models.Image, len(images))
+	for i, image := range images {
+		var metadata map[string]interface{}
+		if image.Metadata.Valid {
+			err := json.Unmarshal(image.Metadata.RawMessage, &metadata)
+			if err != nil {
+				return nil, err
+			}
+		}
+		imageModels[i] = models.Image{
+			Filename:    image.Filename,
+			Description: image.Description.String,
+			Metadata:    metadata,
 		}
 	}
-
-	return &models.Image{
-		Filename:    image.Filename,
-		Description: image.Description.String,
-		Metadata:    metadata,
-	}, nil
+	return imageModels, nil
 }
 
 func (s *Storage) BaseDir() string {
