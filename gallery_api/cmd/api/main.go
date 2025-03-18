@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -35,8 +36,14 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
+	maxFileSizeStr := os.Getenv("MAX_FILE_SIZE")
+	maxFileSize, err := strconv.ParseInt(maxFileSizeStr, 10, 64)
+	if err != nil {
+		log.Fatalf("failed to parse MAX_FILE_SIZE: %v", err)
+	}
+
 	storage := storage.NewStorage(baseDir, db)
-	handlers := handlers.NewHandlers(storage, 10*1024*1024) // 10MB limit
+	handlers := handlers.NewHandlers(storage, maxFileSize) // 10MB limit
 
 	e.POST("/upload", handlers.UploadImage)
 	e.GET("/image", handlers.GetImage)
