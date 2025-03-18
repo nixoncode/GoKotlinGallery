@@ -46,6 +46,9 @@ func main() {
 	storage := storage.NewStorage(baseDir, db)
 	handlers := handlers.NewHandlers(storage, maxFileSize) // 10MB limit
 
+	e.GET("/healthz", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, Response{Message: "OK"})
+	})
 	e.POST("/upload", handlers.UploadImage)
 	e.GET("/image", handlers.GetImage)
 	e.GET("/details", handlers.GetImageDetails)
