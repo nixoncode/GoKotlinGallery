@@ -10,7 +10,6 @@ SELECT *
 FROM images
 WHERE filename = $1;
 
--- name: GetImageDetails :one
+-- name: ListAllImageDetails :many
 SELECT filename, metadata, description
-FROM images
-WHERE filename = $1;
+FROM images;
