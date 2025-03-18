@@ -1,1 +1,1 @@
-DROP TABLE gallery.images;
+DROP TABLE images;

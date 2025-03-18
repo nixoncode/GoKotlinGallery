@@ -1,4 +1,4 @@
-CREATE TABLE gallery.images
+CREATE TABLE images
 (
     id SERIAL PRIMARY KEY,
     filename VARCHAR(255) NOT NULL,
