@@ -95,7 +95,7 @@ func (h *Handlers) UploadImage(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{Message: "File uploaded successfully"})
 }
 
-func (h *Handlers) GetImages(c echo.Context) error {
+func (h *Handlers) GetImage(c echo.Context) error {
 	filename := c.QueryParam("filename")
 	if filename == "" {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Filename is required"})
