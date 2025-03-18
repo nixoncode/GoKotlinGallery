@@ -58,21 +58,36 @@ func (q *Queries) GetImage(ctx context.Context, filename string) (Image, error) 
 	return i, err
 }
 
-const getImageDetails = `-- name: GetImageDetails :one
+const listAllImageDetails = `-- name: ListAllImageDetails :many
 SELECT filename, metadata, description
 FROM images
-WHERE filename = $1
 `
 
-type GetImageDetailsRow struct {
+type ListAllImageDetailsRow struct {
 	Filename    string                `json:"filename"`
 	Metadata    pqtype.NullRawMessage `json:"metadata"`
 	Description sql.NullString        `json:"description"`
 }
 
-func (q *Queries) GetImageDetails(ctx context.Context, filename string) (GetImageDetailsRow, error) {
-	row := q.db.QueryRowContext(ctx, getImageDetails, filename)
-	var i GetImageDetailsRow
-	err := row.Scan(&i.Filename, &i.Metadata, &i.Description)
-	return i, err
+func (q *Queries) ListAllImageDetails(ctx context.Context) ([]ListAllImageDetailsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listAllImageDetails)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAllImageDetailsRow
+	for rows.Next() {
+		var i ListAllImageDetailsRow
+		if err := rows.Scan(&i.Filename, &i.Metadata, &i.Description); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
