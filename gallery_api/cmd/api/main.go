@@ -50,8 +50,8 @@ func main() {
 		return c.JSON(http.StatusOK, Response{Message: "OK"})
 	})
 	e.POST("/upload", handlers.UploadImage)
-	e.GET("/image", handlers.GetImages)
-	e.GET("/details", handlers.GetImageDetails)
+	e.GET("/image", handlers.GetImage)
+	e.GET("/images", handlers.GetImageDetails)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:6661"))
 }
