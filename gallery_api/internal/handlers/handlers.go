@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
+	"github.com/nixoncode/gallery_api/internal/models"
 	"github.com/nixoncode/gallery_api/internal/storage"
 	"github.com/nixoncode/gallery_api/internal/utils"
 )
@@ -101,13 +103,29 @@ func (h *Handlers) GetImage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Filename is required"})
 	}
 
-	file, err := h.storage.GetImage(filename)
+	imageDetails, err := h.storage.GetImage(f)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, Response{Error: "Image details not found"})
+	}
+
+	imageURL := fmt.Sprintf("/image/file?filename=%s", filename)
+	imageResponse := models.ImageResponse{Image: &imageDetails[0], URL: imageURL}
+
+	return c.JSON(http.StatusOK, Response{Data: imageDetails})
+}
+
+func (h *Handlers) GetImageFile(c echo.Context) error {
+	filename := c.QueryParam("filename")
+	if filename == "" {
+		return c.JSON(http.StatusBadRequest, Response{Error: "Filename is required"})
+	}
+
+	filePath, err := h.storage.GetImageFilePath(filename)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, Response{Error: "File not found"})
 	}
-	defer file.Close()
 
-	return c.Stream(http.StatusOK, "image/jpeg", file)
+	return c.File(filePath)
 }
 
 func (h *Handlers) GetImageDetails(c echo.Context) error {

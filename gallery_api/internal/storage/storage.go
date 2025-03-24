@@ -87,3 +87,12 @@ func (s *Storage) GetImageDetails() ([]models.Image, error) {
 func (s *Storage) BaseDir() string {
 	return s.baseDir
 }
+
+func (s *Storage) GetImageFilePath(filename string) (string, error) {
+	filePath := filepath.Join(s.baseDir, filename)
+	_, err := os.Stat(filePath)
+	if err != nil {
+		return "", err
+	}
+	return filePath, nil
+}

@@ -9,3 +9,8 @@ type Image struct {
 	Metadata    map[string]interface{} `json:"metadata"`
 	CreatedAt   time.Time              `json:"created_at"`
 }
+
+type ImageResponse struct {
+	*Image
+	URL string `json:"url"`
+}

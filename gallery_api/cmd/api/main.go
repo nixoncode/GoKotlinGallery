@@ -51,6 +51,7 @@ func main() {
 	})
 	e.POST("/upload", handlers.UploadImage)
 	e.GET("/image", handlers.GetImage)
+	e.GET("/image/file", handlers.GetImageFile)
 	e.GET("/images", handlers.GetImageDetails)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:6661"))
